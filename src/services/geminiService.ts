@@ -11,7 +11,6 @@ export const getOracleInterpretation = async (question: string, hexagram: number
         }]
       })
     });
-
     if (!response.ok) throw new Error('网络感应失败');
     const data = await response.json();
     return data.text;
@@ -28,6 +27,41 @@ export const getDailyEnergy = async (lang: string) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: `Generate a 'Daily Energy' based on the Five Elements. Return JSON: {element, meaning, suggestion}. Language: ${lang}.` }] }]
+      })
+    });
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getFengShuiAdvice = async (desk: string, bed: string, room: string, lang: string) => {
+  try {
+    const response = await fetch("/api/server", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `Provide Feng Shui advice. Desk: ${desk}, Bed: ${bed}, Room: ${room}. Language: ${lang}.` }] }]
+      })
+    });
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getFengShuiImageAdvice = async (imageBase64: string, lang: string) => {
+  try {
+    const response = await fetch("/api/server", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image: imageBase64,
+        contents: [{ parts: [{ text: `Analyze this room image for Feng Shui. Language: ${lang}.` }] }]
       })
     });
     const data = await response.json();
