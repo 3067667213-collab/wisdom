@@ -20,7 +20,7 @@ export const getOracleInterpretation = async (question: string, hexagram: number
           }] 
         }]
       })
-    })
+    });
 
     if (!response.ok) throw new Error('网络感应失败');
     const data = await response.json();
@@ -29,15 +29,6 @@ export const getOracleInterpretation = async (question: string, hexagram: number
     console.error(error);
     throw error;
   }
-};
-    contents: `Generate a 'Daily Energy' based on the Five Elements (Wood, Fire, Earth, Metal, Water). 
-    Return a JSON object with: element, meaning, and suggestion (a short daily action).
-    The language of the response should be ${lang === 'zh' ? 'Chinese' : lang === 'ja' ? 'Japanese' : 'English'}.`,
-    config: { responseMimeType: "application/json" }
-  });
-  return JSON.parse(response.text!);
-};
-
 export const getFengShuiAdvice = async (desk: string, bed: string, room: string, lang: string) => {
   const ai = getAI();
   const response = await ai.models.generateContent({
