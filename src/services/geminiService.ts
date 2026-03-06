@@ -9,25 +9,20 @@ const getAI = () => {
 };
 
 export const getOracleInterpretation = async (question: string, hexagram: number[], lang: string) => {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
-    contents: `You are a Grand Master of I Ching (Liu Yao/六爻) and traditional Eastern Wisdom. 
-    A user has asked: "${question}".
-    The hexagram was cast using the 3-coin method. The lines (from bottom to top) are: ${JSON.stringify(hexagram)}.
-    (Note: 3 heads = Old Yang/Changing, 0 = Old Yin/Changing, 1 = Yang, 2 = Yin).
-
-    Please provide a professional, insightful, and encouraging analysis following this structure:
-    1. **Hexagram Name & Symbolic Meaning**: Identify the primary hexagram and its core message.
-    2. **Line-by-Line Analysis**: Focus on the changing lines (if any) and how they relate to the user's specific question (e.g., career, timing, obstacles).
-    3. **The Resulting Hexagram**: If there are changing lines, explain the transformation and the final outcome.
-    4. **Practical Advice**: Specific actions or mindset shifts the user should consider.
-    5. **Timing (Optional)**: If the question is about "when", use traditional wisdom to suggest a likely timeframe.
-
-    The language of the response must be ${lang === 'zh' ? 'Chinese' : lang === 'ja' ? 'Japanese' : 'English'}.
-    Maintain a tone of respect, wisdom, and modern practicality. Use Markdown for formatting.`
+  const response = await fetch("/api/server", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ 
+        parts: [{ 
+          text: `You are a Grand Master of I Ching. A user asked: "${question}". Hexagram: ${JSON.stringify(hexagram)}. Respond in ${lang === 'zh' ? 'Chinese' : 'English'}.` 
+        }] 
+      }]
+    })
   });
-  return response.text;
+
+  const data = await response.json();
+  return data.text || "占卜感应中断，请重试";
 };
 
 export const getDailyEnergy = async (lang: string) => {
