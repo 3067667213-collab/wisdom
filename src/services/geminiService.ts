@@ -20,7 +20,7 @@ export const getOracleInterpretation = async (question: string, hexagram: number
           }] 
         }]
       })
-    });
+    })
 
     if (!response.ok) throw new Error('网络感应失败');
     const data = await response.json();
