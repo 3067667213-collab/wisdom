@@ -31,11 +31,15 @@ export const getOracleInterpretation = async (question: string, hexagram: number
 
 export const getDailyEnergy = async (lang: string) => {
   try {
-    const ai = getAI();
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Generate a 'Daily Energy' based on the Five Elements. Return JSON: {element, meaning, suggestion}. Language: ${lang}.`;
-    const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
+    const response = await fetch("/api/server", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `Generate a 'Daily Energy' based on the Five Elements. Return JSON: {element, meaning, suggestion}. Language: ${lang}.` }] }]
+      })
+    });
+    const data = await response.json();
+    return data.text;
   } catch (error) {
     console.error(error);
     throw error;
