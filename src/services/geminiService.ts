@@ -1,3 +1,4 @@
+// 这里的代码不再直接依赖 Google 库，而是通过 fetch 访问你自己的后端
 export const getOracleInterpretation = async (question: string, hexagram: number[], lang: string) => {
   try {
     const response = await fetch("/api/server", {
