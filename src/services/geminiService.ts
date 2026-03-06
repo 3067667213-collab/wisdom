@@ -24,12 +24,12 @@ export const getOracleInterpretation = async (question: string, hexagram: number
 
     if (!response.ok) throw new Error('网络感应失败');
     const data = await response.json();
-    return data.text; // 这里必须对应后端返回的 { text }
+    return data.text;
   } catch (error) {
     console.error(error);
     throw error;
   }
-export const getFengShuiAdvice = async (desk: string, bed: string, room: string, lang: string) => {
+};
   const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
