@@ -9,26 +9,27 @@ const getAI = () => {
 };
 
 export const getOracleInterpretation = async (question: string, hexagram: number[], lang: string) => {
-  const response = await fetch("/api/server", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ 
-        parts: [{ 
-          text: `You are a Grand Master of I Ching. A user asked: "${question}". Hexagram: ${JSON.stringify(hexagram)}. Respond in ${lang === 'zh' ? 'Chinese' : 'English'}.` 
-        }] 
-      }]
-    })
-  });
+  try {
+    const response = await fetch("/api/server", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ 
+          parts: [{ 
+            text: `你是一位周易大师。用户问："${question}"。卦象是：${JSON.stringify(hexagram)}。请用${lang === 'zh' ? '中文' : '英文'}解析。` 
+          }] 
+        }]
+      })
+    });
 
-  const data = await response.json();
-  return data.text || "占卜感应中断，请重试";
+    if (!response.ok) throw new Error('网络感应失败');
+    const data = await response.json();
+    return data.text; // 这里必须对应后端返回的 { text }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
-
-export const getDailyEnergy = async (lang: string) => {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
     contents: `Generate a 'Daily Energy' based on the Five Elements (Wood, Fire, Earth, Metal, Water). 
     Return a JSON object with: element, meaning, and suggestion (a short daily action).
     The language of the response should be ${lang === 'zh' ? 'Chinese' : lang === 'ja' ? 'Japanese' : 'English'}.`,
