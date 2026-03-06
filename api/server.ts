@@ -1,34 +1,21 @@
-import express from "express";
-import { createServer as createViteServer } from "vite";
-import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-dotenv.config();
+export default async function handler(req: any, res: any) {
+  // 只准许 POST 请求
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  app.use(express.json());
-
-  // API Routes (None currently needed for Gemini as it's handled in frontend)
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
-  });
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    app.use(express.static("dist"));
+  try {
+    const { contents } = req.body; // 接收前端发来的问题
+    const result = await model.generateContent(contents);
+    const response = await result.response;
+    const text = response.text();
+    
+    // 把结果传回给前端
+    res.status(200).json({ text });
+  } catch (error) {
+    res.status(500).json({ error: "AI 感应失败", details: error });
   }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
 }
-
-startServer();
